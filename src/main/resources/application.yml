@@ -1,0 +1,5 @@
+tablestore:
+  end-point: '******'
+  access-key-id: '******'
+  access-key-secret: '******'
+  instance-name: '******'
