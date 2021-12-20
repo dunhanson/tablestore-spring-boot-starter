@@ -2,7 +2,7 @@
 
 ## 开始
 
-引入依赖
+**依赖**
 
 ```xml
 <dependency>
@@ -12,7 +12,7 @@
 </dependency>
 ```
 
-spring boot yml
+**application.yml**
 
 ```yml
 aliyun:
@@ -23,7 +23,7 @@ aliyun:
     instance-name: 'XXXXXX'
 ```
 
-java
+**java**
 
 实体类
 
