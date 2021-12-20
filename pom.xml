@@ -10,7 +10,7 @@
     </parent>
     <groupId>site.dunhanson</groupId>
     <artifactId>tablestore-spring-boot-starter</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.0.1</version>
     <name>tablestore-spring-boot-starter</name>
     <description>Tablestore project for Spring Boot Starter</description>
     <url>https://github.com/dunhanson/tablestore-spring-boot-starter</url>
