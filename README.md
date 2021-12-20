@@ -23,7 +23,23 @@ aliyun:
     instance-name: 'XXXXXX'
 ```
 
-java示例
+java
+
+实体类
+
+```java
+@Data
+@Table(tableName = "archives", indexName = "archives_index")
+public class Archives {
+    private String id;
+    private String title;
+    private String content;
+    private String createTime;
+    private String updateTime;
+}
+```
+
+查询
 
 ```java
 @RunWith(SpringRunner.class)
