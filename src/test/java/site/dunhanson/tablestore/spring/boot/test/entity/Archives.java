@@ -9,7 +9,7 @@ import site.dunhanson.tablestore.spring.boot.annotation.Table;
  * @since 2021/12/17
  */
 @Data
-@Table(tableName = "archives", indexName = {"archives_index"})
+@Table(tableName = "archives", indexName = "archives_index")
 public class Archives {
     private String id;
     private String title;
