@@ -251,19 +251,36 @@ public class TablestoreTemplate {
                     continue;
                 }
                 Class<?> type = field.getType();
-                if(ClassUtil.isBasicType(type) || type == String.class) {
+                if(ClassUtil.isBasicType(type) && type == Integer.class) {
+                    setValue(t, field, Long.valueOf(column.getValue().asLong()).intValue());
+                } else if(ClassUtil.isBasicType(type) || type == String.class) {
                     // 基本类型或者String类型
-                    field.set(t, column.getValue().getValue());
+                    setValue(t, field, column.getValue().getValue());
                 } else {
                     // 复合类型
                     String json = column.getValue().asString();
-                    field.set(t, gson.fromJson(json, field.getAnnotatedType().getType()));
+                    setValue(t, field, gson.fromJson(json, field.getAnnotatedType().getType()));
                 }
             }
         } catch (Exception e) {
             log.error("rowToBean fail {}", e.getMessage());
         }
         return t;
+    }
+
+    /**
+     * 对象属性赋值
+     * @param t 对象
+     * @param field 属性
+     * @param value 值
+     * @param <T> 泛型
+     */
+    public <T> void setValue(T t, Field field, Object value) {
+        try {
+            field.set(t, value);
+        } catch (IllegalAccessException e) {
+            log.error("setValue fail:{}, filed:{}, value:{}", e.getMessage(), field.getName(), value);
+        }
     }
 
 }
