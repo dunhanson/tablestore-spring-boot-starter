@@ -2,6 +2,7 @@ package site.dunhanson.tablestore.spring.boot.core;
 
 import cn.hutool.core.util.ClassUtil;
 import cn.hutool.core.util.PageUtil;
+import cn.hutool.json.JSONUtil;
 import com.alicloud.openservices.tablestore.SyncClient;
 import com.alicloud.openservices.tablestore.model.*;
 import com.alicloud.openservices.tablestore.model.search.SearchQuery;
@@ -18,6 +19,8 @@ import site.dunhanson.tablestore.spring.boot.constant.TablestoreConstant;
 import site.dunhanson.tablestore.spring.boot.entity.Condition;
 import site.dunhanson.tablestore.spring.boot.entity.Page;
 import site.dunhanson.tablestore.spring.boot.entity.PageInfo;
+
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -229,41 +232,55 @@ public class TablestoreTemplate {
         T t = null;
         try {
             t = clazz.newInstance();
-            PrimaryKey primaryKey = row.getPrimaryKey();
-            for(Field field : ClassUtil.getDeclaredFields(clazz)) {
-                field.setAccessible(true);
-                // Column名称
-                String columnName = toLowerUnderscore(field.getName());
-                // 主键
-                PrimaryKeyColumn primaryKeyColumn = primaryKey.getPrimaryKeyColumn(columnName);
-                if(primaryKeyColumn != null) {
+        } catch (Exception e) {
+            log.error("newInstance fail {}", e.getMessage());
+        }
+        PrimaryKey primaryKey = row.getPrimaryKey();
+        for(Field field : ClassUtil.getDeclaredFields(clazz)) {
+            field.setAccessible(true);
+            // Column名称
+            String columnName = toLowerUnderscore(field.getName());
+            // 主键
+            PrimaryKeyColumn primaryKeyColumn = primaryKey.getPrimaryKeyColumn(columnName);
+            if(primaryKeyColumn != null) {
+                try {
                     field.set(t, primaryKeyColumn.getValue().toColumnValue().getValue());
-                    continue;
+                } catch (IllegalAccessException | IOException e) {
+                    e.printStackTrace();
                 }
-                // Column
-                Column column = row.getLatestColumn(columnName);
-                if(column == null) {
-                    continue;
-                }
-                // Column值
-                ColumnValue value = column.getValue();
-                if(value == null) {
-                    continue;
-                }
-                Class<?> type = field.getType();
-                if(ClassUtil.isBasicType(type) && type == Integer.class) {
-                    setValue(t, field, Long.valueOf(column.getValue().asLong()).intValue());
-                } else if(ClassUtil.isBasicType(type) || type == String.class) {
-                    // 基本类型或者String类型
-                    setValue(t, field, column.getValue().getValue());
-                } else {
-                    // 复合类型
-                    String json = column.getValue().asString();
-                    setValue(t, field, gson.fromJson(json, field.getAnnotatedType().getType()));
+                continue;
+            }
+            // Column
+            Column column = row.getLatestColumn(columnName);
+            if(column == null) {
+                continue;
+            }
+            // Column值
+            ColumnValue value = column.getValue();
+            if(value == null) {
+                continue;
+            }
+            Class<?> type = field.getType();
+            if(ClassUtil.isBasicType(type) && type == Integer.class) {
+                setValue(t, field, Long.valueOf(column.getValue().asLong()).intValue());
+            } else if(ClassUtil.isBasicType(type) || type == String.class) {
+                // 基本类型或者String类型
+                setValue(t, field, column.getValue().getValue());
+            } else {
+                // 复合类型
+                String json = column.getValue().asString();
+                try {
+                    if(JSONUtil.isJsonArray(json)) {
+                        setValue(t, field, JSONUtil.toList(json, field.getAnnotatedType().getType().getClass()));
+                    } else if(JSONUtil.isJson(json)) {
+                        setValue(t, field, gson.fromJson(json, field.getAnnotatedType().getType()));
+                    } else {
+                        setValue(t, field, json);
+                    }
+                } catch (Exception e) {
+                    log.warn("{} filed:{} value:{}", e.getMessage(), field.getName(), value);
                 }
             }
-        } catch (Exception e) {
-            log.error("rowToBean fail {}", e.getMessage());
         }
         return t;
     }
