@@ -270,15 +270,9 @@ public class TablestoreTemplate {
                 // 复合类型
                 String json = column.getValue().asString();
                 try {
-                    if(JSONUtil.isJsonArray(json)) {
-                        setValue(t, field, JSONUtil.toList(json, field.getAnnotatedType().getType().getClass()));
-                    } else if(JSONUtil.isJson(json)) {
-                        setValue(t, field, gson.fromJson(json, field.getAnnotatedType().getType()));
-                    } else {
-                        setValue(t, field, json);
-                    }
-                } catch (Exception e) {
-                    log.warn("{} filed:{} value:{}", e.getMessage(), field.getName(), value);
+                    field.set(t, gson.fromJson(json, field.getAnnotatedType().getType()));
+                } catch (IllegalAccessException e) {
+                    log.warn(e.getMessage());
                 }
             }
         }
