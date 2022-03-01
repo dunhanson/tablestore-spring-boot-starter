@@ -3,6 +3,8 @@ package site.dunhanson.tablestore.spring.boot.entity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
+
 import java.util.List;
 
 /**
@@ -38,4 +40,15 @@ public class PageInfo<T> {
      * 数据
      */
     private List<T> records;
+
+    @Override
+    public String toString() {
+        return "PageInfo{" +
+                "size=" + size +
+                ", current=" + current +
+                ", index=" + index +
+                ", pages=" + pages +
+                ", total=" + total +
+                '}';
+    }
 }
