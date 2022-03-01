@@ -26,6 +26,8 @@ import site.dunhanson.tablestore.spring.boot.util.TablestoreUtils;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 import static site.dunhanson.tablestore.spring.boot.util.TablestoreUtils.toLowerUnderscore;
@@ -179,6 +181,7 @@ public class TablestoreTemplate {
      * @return PageInfo
      */
     public <T> PageInfo<T> page(Class<T> clazz, Page page, Query query, List<Sort.Sorter> sorts, List<String> returnColumns) {
+        LocalDateTime start = LocalDateTime.now();
         // 需要获取的记录大小
         int needToGetNum = page.getPageSize();
         // 实际能够查询到的记录大小
@@ -205,6 +208,7 @@ public class TablestoreTemplate {
             if(tempPageNo == null || pageNo <= 99) {
                 tempPageNo = pageNo;
             }
+            log.debug("tablestore page search, pages:{}, pageNo:{}", pages, pageNo);
             // 分页查询
             PageInfo<T> loopPageInfo = this.search(clazz, new Page(tempPageNo, pageSize), query, sorts, returnColumns);
             List<T> loopRecords = loopPageInfo.getRecords();
@@ -229,6 +233,7 @@ public class TablestoreTemplate {
         pageInfo.setSize(records.size());
         // 设置总页数
         pageInfo.setPages(PageUtil.totalPage(actualTotalNum, records.size()));
+        log.debug("elapsed-time:{}s, pageInfo:{}", Duration.between(start, LocalDateTime.now()), pageInfo);
         return pageInfo;
     }
 
