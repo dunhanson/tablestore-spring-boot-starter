@@ -1,6 +1,7 @@
 package site.dunhanson.tablestore.spring.boot.test.entity;
 
 import lombok.Data;
+import site.dunhanson.tablestore.spring.boot.annotation.PrimaryKey;
 import site.dunhanson.tablestore.spring.boot.annotation.Table;
 
 /**
@@ -11,7 +12,8 @@ import site.dunhanson.tablestore.spring.boot.annotation.Table;
 @Data
 @Table(tableName = "archives", indexName = "archives_index")
 public class Archives {
-    private String id;
+    @PrimaryKey("id")
+    private Long id;
     private String title;
     private String content;
     private String createTime;

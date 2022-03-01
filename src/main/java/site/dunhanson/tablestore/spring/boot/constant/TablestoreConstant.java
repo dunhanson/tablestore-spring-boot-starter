@@ -20,4 +20,9 @@ public class TablestoreConstant {
      * 默认分页大小
      */
     public static final int DEFAULT_PAGE_SIZE = 30;
+
+    /**
+     * 最大偏移量offset
+     */
+    public static final int MAX_OFFSET = 10000;
 }

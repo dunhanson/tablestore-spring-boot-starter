@@ -10,12 +10,12 @@ import java.lang.annotation.Target;
  * @author dunhanson
  * @since 2021-12-07
  */
-@Target(ElementType.FIELD)
+@Target({ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface PrimaryKey {
     /**
      * 主键名称
      * @return 主键名称
      */
-    String name() default "";
+    String value() default "";
 }
