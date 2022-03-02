@@ -233,7 +233,9 @@ public class TablestoreTemplate {
         pageInfo.setSize(records.size());
         // 设置总页数
         pageInfo.setPages(PageUtil.totalPage(actualTotalNum, records.size()));
-        log.debug("elapsed-time:{}s, pageInfo:{}", Duration.between(start, LocalDateTime.now()), pageInfo);
+        // 耗时计算
+        long seconds = Duration.between(start, LocalDateTime.now()).getSeconds();
+        log.debug("elapsed-time:{}s, pageInfo:{}", seconds, pageInfo);
         return pageInfo;
     }
 

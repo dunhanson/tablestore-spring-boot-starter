@@ -1,12 +1,14 @@
 package site.dunhanson.tablestore.spring.boot.test;
 
 import com.alicloud.openservices.tablestore.model.ColumnValue;
+import com.alicloud.openservices.tablestore.model.search.query.MatchPhraseQuery;
 import com.alicloud.openservices.tablestore.model.search.query.TermQuery;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 import site.dunhanson.tablestore.spring.boot.core.TablestoreTemplate;
+import site.dunhanson.tablestore.spring.boot.entity.Page;
 import site.dunhanson.tablestore.spring.boot.entity.PageInfo;
 import site.dunhanson.tablestore.spring.boot.test.entity.Archives;
 import javax.annotation.Resource;
