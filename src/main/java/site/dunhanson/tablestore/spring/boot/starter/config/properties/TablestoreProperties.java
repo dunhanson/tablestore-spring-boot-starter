@@ -4,14 +4,14 @@ import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
- * tablestore基本配置
- * <pre>
+ * tablestore配置.
+ * <p>基本的配置:
+ * <p><pre class="code">
  * tablestore:
  *   end-point: '******'
  *   access-key-id: '******'
  *   access-key-secret: '******'
- *   instance-name: '******'
- * </pre>
+ *   instance-name: '******'</pre>
  * @author dunhanson
  * @version  0.0.1
  * @since 0.0.1

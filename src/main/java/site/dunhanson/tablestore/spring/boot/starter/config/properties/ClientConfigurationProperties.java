@@ -5,9 +5,10 @@ import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
- * tablestore的相关配置
+ * tablestore详细配置相关
+ * <p></p>
  * @author dunhanson
- * @version  0.0.1
+ * @version 0.0.1
  * @since 0.0.1
  */
 @Data

@@ -6,7 +6,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * 表名注解
+ * tablestore表注解
  * @author dunhanson
  * @version  0.0.1
  * @since 0.0.1

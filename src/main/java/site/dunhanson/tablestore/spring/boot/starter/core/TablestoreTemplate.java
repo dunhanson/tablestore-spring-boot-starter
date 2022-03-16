@@ -3,6 +3,7 @@ package site.dunhanson.tablestore.spring.boot.starter.core;
 import cn.hutool.core.util.ClassUtil;
 import cn.hutool.core.util.PageUtil;
 import com.alicloud.openservices.tablestore.SyncClient;
+import com.alicloud.openservices.tablestore.TableStoreException;
 import com.alicloud.openservices.tablestore.model.*;
 import com.alicloud.openservices.tablestore.model.search.SearchQuery;
 import com.alicloud.openservices.tablestore.model.search.SearchRequest;
@@ -22,7 +23,6 @@ import site.dunhanson.tablestore.spring.boot.starter.entity.Condition;
 import site.dunhanson.tablestore.spring.boot.starter.entity.Page;
 import site.dunhanson.tablestore.spring.boot.starter.entity.PageInfo;
 import site.dunhanson.tablestore.spring.boot.starter.util.TablestoreUtils;
-
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.time.Duration;
@@ -31,17 +31,17 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * 执行Tablestore表格存储模板操作.
- * <p>{@code
- *   TermQuery query = new TermQuery();
- *   query.setFieldName("tenderee");
- *   query.setTerm(ColumnValue.fromString("邯郸钢铁集团有限责任公司"));
- *   PageInfo<Document> pageInfo = tablestoreTemplate.search(Document.class, new Page(1, 5), query);
- *   System.out.println(pageInfo.getCurrent(0));
- *   System.out.println(pageInfo.getSize());
- *   System.out.println(pageInfo.getTotal());
- *   System.out.println(pageInfo.getPages());
- * }</pre>
+ * tablestore模板操作.
+ * <p>简单的操作例子:
+ * <p><pre class="code">
+ * TermQuery query = new TermQuery();
+ * query.setFieldName("tenderee");
+ * query.setTerm(ColumnValue.fromString("邯郸钢铁集团有限责任公司"));
+ * PageInfo<Document> pageInfo = tablestoreTemplate.search(Document.class, new Page(1, 5), query);
+ * System.out.println(pageInfo.getCurrent());
+ * System.out.println(pageInfo.getSize());
+ * System.out.println(pageInfo.getTotal());
+ * System.out.println(pageInfo.getPages());</pre>
  * @author dunhanson
  * @version  0.0.1
  * @since 0.0.1
@@ -307,11 +307,11 @@ public class TablestoreTemplate {
      * @return 对象
      */
     private <T> T rowToBean(Row row, Class<T> clazz) {
-        T t = null;
+        T t;
         try {
             t = clazz.newInstance();
         } catch (Exception e) {
-            log.error("newInstance fail {}", e.getMessage());
+            throw new TableStoreException("newInstance fail", e.getMessage());
         }
         PrimaryKey primaryKey = row.getPrimaryKey();
         for(Field field : ClassUtil.getDeclaredFields(clazz)) {
@@ -340,6 +340,7 @@ public class TablestoreTemplate {
             }
             Class<?> type = field.getType();
             if(ClassUtil.isBasicType(type) && type == Integer.class) {
+                // 整型
                 setValue(t, field, Long.valueOf(column.getValue().asLong()).intValue());
             } else if(ClassUtil.isBasicType(type) || type == String.class) {
                 // 基本类型或者String类型
@@ -350,7 +351,7 @@ public class TablestoreTemplate {
                 try {
                     field.set(t, gson.fromJson(json, field.getAnnotatedType().getType()));
                 } catch (IllegalAccessException e) {
-                    log.warn(e.getMessage());
+                    log.error("setValue fail:{}, filed:{}, value:{}", e.getMessage(), field.getName(), value);
                 }
             }
         }

@@ -6,7 +6,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * 属性注解
+ * tablestore表字段注解
  * @author dunhanson
  * @version  0.0.1
  * @since 0.0.1
@@ -16,7 +16,7 @@ import java.lang.annotation.Target;
 public @interface Column {
     /**
      * 属性名称
-     * @return 主键名称
+     * @return 字段
      */
     String name() default "";
 }
