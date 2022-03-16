@@ -25,6 +25,7 @@ import site.dunhanson.tablestore.spring.boot.starter.entity.PageInfo;
 import site.dunhanson.tablestore.spring.boot.starter.util.TablestoreUtils;
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.lang.reflect.Type;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -59,9 +60,10 @@ public class TablestoreTemplate {
     private Gson gson;
 
     /**
-     * 搜索
+     * 查询，使用Condition作为查询条件
+     * <p>{@link #search(Class, Query, Page, List, List)}的派生查询</p>
      * @param clazz 需要转换的泛型类
-     * @param condition 条件
+     * @param condition 查询条件
      * @param <T> 泛型
      * @return 分页信息对象
      */
@@ -70,13 +72,14 @@ public class TablestoreTemplate {
         Query query = condition.getQuery();
         List<Sort.Sorter> sorts = condition.getSorts();
         List<String> returnColumns = condition.getReturnColumns();
-        return search(clazz, page, query, sorts, returnColumns);
+        return search(clazz, query, page, sorts, returnColumns);
     }
 
     /**
-     * 查询
+     * 查询，无分页、无排序、返回所有字段
+     * <p>{@link #search(Class, Query, Page, List, List)}的派生查询</p>
      * @param clazz 需要转换的泛型类
-     * @param query Query
+     * @param query 根查询Query
      * @param <T> 泛型
      * @return 分页信息对象
      */
@@ -85,10 +88,11 @@ public class TablestoreTemplate {
     }
 
     /**
-     * 查询
+     * 查询，无排序、返回所有字段
+     * <p>{@link #search(Class, Query, Page, List, List)}的派生查询</p>
      * @param clazz 需要转换的泛型类
      * @param page 分页对象
-     * @param query Query
+     * @param query 根查询Query
      * @param <T> 泛型
      * @return 分页信息对象
      */
@@ -97,29 +101,33 @@ public class TablestoreTemplate {
     }
 
     /**
-     * 查询
+     * 查询，无排序
+     * <p>{@link #search(Class, Query, Page, List, List)}的派生查询</p>
      * @param clazz 需要转换的泛型类
      * @param page 分页对象
-     * @param query Query
-     * @param returnColumns 查询需要返回的字段集合
+     * @param query 根查询Query
+     * @param returnColumns 返回的字段集合
      * @param <T> 泛型
      * @return 分页信息对象
      */
     public <T> PageInfo<T> search(Class<T> clazz, Page page, Query query, List<String> returnColumns) {
-        return this.search(clazz, page, query,null, returnColumns);
+        return this.search(clazz, query, page,null, returnColumns);
     }
 
     /**
      * 查询
+     * <p>主要通过传递的参数进行填充{@link SearchQuery#SearchQuery()}对象</p>
+     * <p>通过{@code Class<T>}填充{@link SearchRequest#SearchRequest(String, String, SearchQuery)}</p>
+     * <p>把{@link #rowsToBeans(List, Class)}转换获取records，赋值给{@link PageInfo}</p>
      * @param clazz 需要转换的泛型类
+     * @param query 根查询Query
      * @param page 分页对象
-     * @param query Query
      * @param sorts 排序集合
-     * @param returnColumns v
+     * @param returnColumns 返回字段集合
      * @param <T> 泛型
      * @return 分页信息对象
      */
-    public <T> PageInfo<T> search(Class<T> clazz, Page page, Query query, List<Sort.Sorter> sorts, List<String> returnColumns) {
+    public <T> PageInfo<T> search(Class<T> clazz, Query query, Page page, List<Sort.Sorter> sorts, List<String> returnColumns) {
         // 当前页
         int pageNo = Optional.ofNullable(page.getPageNo()).orElse(TablestoreConstant.DEFAULT_PAGE_NO);
         // 分页大小
@@ -181,15 +189,20 @@ public class TablestoreTemplate {
 
     /**
      * 分页查询
+     * <p>首先进行第一次查询，获取总记录数</p>
+     * <p>然后通过默认分页大小参数计算出总页数，进行分页查询</p>
+     * <p>当前页小于99页的时候，递归调用</p>
+     * <p>当前页大于等于99页的时候，需要进行设置下一页查询条件，调用{@link #setNextPageQuery(Object, int, Query)}方法</p>
+     * <p>设置下一页查询条件主要逻辑就是添加一个Query，条件是大于上一次查询结果的最后一条记录的主键</p>
      * @param clazz Class
-     * @param page Page
      * @param query Query
+     * @param page Page
      * @param sorts Sort.Sorter
      * @param returnColumns 返回字段
      * @param <T> 实体对象
      * @return PageInfo
      */
-    private <T> PageInfo<T> page(Class<T> clazz, Page page, Query query, List<Sort.Sorter> sorts, List<String> returnColumns) {
+    public <T> PageInfo<T> page(Class<T> clazz, Page page, Query query, List<Sort.Sorter> sorts, List<String> returnColumns) {
         LocalDateTime start = LocalDateTime.now();
         // 需要获取的记录大小
         int needToGetNum = page.getPageSize();
@@ -197,7 +210,7 @@ public class TablestoreTemplate {
         int actualTotalNum;
         // 总记录数
         int total;
-        PageInfo<T> temp = this.search(clazz, Page.single(), query, sorts, returnColumns);
+        PageInfo<T> temp = this.search(clazz, query, Page.single(), sorts, returnColumns);
         actualTotalNum = temp.getTotal();
         // 实际能够查询到的记录大小 < 需要获取的记录大小
         if(actualTotalNum == 0) {
@@ -219,7 +232,7 @@ public class TablestoreTemplate {
             }
             log.debug("tablestore page search, pages:{}, pageNo:{}", pages, pageNo);
             // 分页查询
-            PageInfo<T> loopPageInfo = this.search(clazz, new Page(tempPageNo, pageSize), query, sorts, returnColumns);
+            PageInfo<T> loopPageInfo = this.search(clazz, query, new Page(tempPageNo, pageSize), sorts, returnColumns);
             List<T> loopRecords = loopPageInfo.getRecords();
             records.addAll(loopRecords);
             if(pageNo >= 99) {
@@ -250,9 +263,13 @@ public class TablestoreTemplate {
 
     /**
      * 设置下一页查询
-     * @param entity 对象
+     * <p>设置下一页查询条件主要逻辑就是添加一个RangeQuery，条件是大于上一次查询结果的最后一条记录的主键</p>
+     * <p>pageNo==99时，添加一个RangeQuery到BoolQuery</p>
+     * <p>pageNo>99时，从BoolQuery获取一个RangeQuery</p>
+     * RangeQuery：主键查询，条件是大于上一次查询结果的最后一条记录的主键
+     * @param entity 上一次查询最后一条记录对象，用于获取记录的主键值
      * @param pageNo 当前页
-     * @param query Query
+     * @param query 根查询Query
      * @param <T> 泛型
      */
     private <T> void setNextPageQuery(T entity, int pageNo, Query query) {
@@ -285,13 +302,14 @@ public class TablestoreTemplate {
     }
 
     /**
-     * rows转换成beans
-     * @param rows 行对象集合
+     * {@code List<Row>}转换成转换成{@code List<T>}集合
+     * <p>内部调用{@link #rowToBean(Row, Class)}</p>
+     * @param rows List<Row>
      * @param clazz 需要转换成对象的类
      * @param <T> 泛型
      * @return 对象List集合
      */
-    private <T> List<T> rowsToBeans(List<Row> rows, Class<T> clazz) {
+    public <T> List<T> rowsToBeans(List<Row> rows, Class<T> clazz) {
         List<T> list = new ArrayList<>();
         if(rows == null) {
             return list;
@@ -300,13 +318,19 @@ public class TablestoreTemplate {
     }
 
     /**
-     * 行转换成对象
+     * Row转换成T对象
+     * <p>Class new一个T对象，用于反射赋值属性值，并且最后返回</p>
+     * <p>通过传参Class进行反射获取到所有Field，然后进行遍历Class的属性名</p>
+     * <p>获取到对应的Row的Column，把Column的值赋值到Field，并写入T对象，最后返回T对象</p>
+     * <p>补充说明：
+     * <p>Column的值赋值到FieldField的类型和Column的类型不一致，会导致一些问题需要特殊处理Field类型是Integer或复合类型</p>
+     * <p>Integer需要转成Long类型，然后转成Integer，复合类型一般是json，获取属性的泛型类型，进行转换成对象</p>
      * @param row 行
      * @param clazz 类
      * @param <T> 泛型
      * @return 对象
      */
-    private <T> T rowToBean(Row row, Class<T> clazz) {
+    public <T> T rowToBean(Row row, Class<T> clazz) {
         T t;
         try {
             t = clazz.newInstance();
@@ -348,11 +372,7 @@ public class TablestoreTemplate {
             } else {
                 // 复合类型
                 String json = column.getValue().asString();
-                try {
-                    field.set(t, gson.fromJson(json, field.getAnnotatedType().getType()));
-                } catch (IllegalAccessException e) {
-                    log.error("setValue fail:{}, filed:{}, value:{}", e.getMessage(), field.getName(), value);
-                }
+                setValue(t, field, json, field.getAnnotatedType().getType());
             }
         }
         return t;
@@ -365,12 +385,25 @@ public class TablestoreTemplate {
      * @param value 值
      * @param <T> 泛型
      */
-    private <T> void setValue(T t, Field field, Object value) {
+    private <T> void setValue(T t, Field field, Object value, Type type) {
         try {
+            if(type != null) {
+                value = gson.fromJson((String)value, field.getAnnotatedType().getType());
+            }
             field.set(t, value);
         } catch (IllegalAccessException e) {
             log.error("setValue fail:{}, filed:{}, value:{}", e.getMessage(), field.getName(), value);
         }
+    }
+
+    /**
+     * 对象属性赋值
+     * @param t 对象
+     * @param field 属性
+     * @param value 值
+     */
+    private <T> void setValue(T t, Field field, Object value) {
+        setValue(t, field, value, null);
     }
 
 }
