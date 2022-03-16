@@ -10,7 +10,7 @@
     </parent>
     <groupId>site.dunhanson</groupId>
     <artifactId>tablestore-spring-boot-starter</artifactId>
-    <version>2022.0310.0000</version>
+    <version>0.0.2</version>
     <name>tablestore-spring-boot-starter</name>
     <description>Tablestore project for Spring Boot Starter</description>
     <url>https://github.com/dunhanson/tablestore-spring-boot-starter</url>
@@ -101,6 +101,12 @@
             <artifactId>guava</artifactId>
             <version>${guava.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.jetbrains</groupId>
+            <artifactId>annotations</artifactId>
+            <version>RELEASE</version>
+            <scope>compile</scope>
+        </dependency>
     </dependencies>
     <build>
         <finalName>tablestore-spring-boot-starter</finalName>
@@ -166,7 +172,7 @@
                 </executions>
             </plugin>
             <!-- GPG -->
-            <!--<plugin>
+            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-gpg-plugin</artifactId>
                 <version>1.6</version>
@@ -178,10 +184,10 @@
                         </goals>
                     </execution>
                 </executions>
-            </plugin>-->
+            </plugin>
         </plugins>
     </build>
-    <!--<distributionManagement>
+    <distributionManagement>
         <snapshotRepository>
             <id>sonatype</id>
             <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
@@ -190,29 +196,5 @@
             <id>sonatype</id>
             <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
         </repository>
-    </distributionManagement>-->
-    <distributionManagement>
-        <repository>
-            <id>biaoxunkuaiche</id>
-            <url>https://nexus.biaoxunkuaiche.com/repository/maven-releases/</url>
-        </repository>
-        <snapshotRepository>
-            <id>biaoxunkuaiche</id>
-            <url>https://nexus.biaoxunkuaiche.com/repository/maven-snapshots/</url>
-        </snapshotRepository>
     </distributionManagement>
-    <repositories>
-        <repository>
-            <id>biaoxunkuaiche</id>
-            <url>https://nexus.biaoxunkuaiche.com/repository/maven-public/</url>
-            <releases>
-                <enabled>true</enabled>
-                <updatePolicy>never</updatePolicy>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-                <updatePolicy>always</updatePolicy>
-            </snapshots>
-        </repository>
-    </repositories>
 </project>

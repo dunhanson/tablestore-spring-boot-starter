@@ -1,4 +1,4 @@
-package site.dunhanson.tablestore.spring.boot.entity;
+package site.dunhanson.tablestore.spring.boot.starter.entity;
 
 import com.alicloud.openservices.tablestore.model.search.query.Query;
 import com.alicloud.openservices.tablestore.model.search.sort.Sort;
@@ -11,7 +11,8 @@ import java.util.List;
 /**
  * 搜索条件
  * @author dunhanson
- * @since 2021-12-02
+ * @version  0.0.1
+ * @since 0.0.1
  */
 @Data
 @Builder

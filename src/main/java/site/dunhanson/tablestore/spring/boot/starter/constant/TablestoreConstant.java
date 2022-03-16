@@ -1,9 +1,10 @@
-package site.dunhanson.tablestore.spring.boot.constant;
+package site.dunhanson.tablestore.spring.boot.starter.constant;
 
 /**
  * tablestore常量
  * @author dunhanson
- * @since 2021-12-01
+ * @version  0.0.1
+ * @since 0.0.1
  */
 public class TablestoreConstant {
     /**

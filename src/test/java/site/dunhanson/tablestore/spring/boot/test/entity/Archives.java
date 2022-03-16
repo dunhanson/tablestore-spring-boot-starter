@@ -1,8 +1,8 @@
 package site.dunhanson.tablestore.spring.boot.test.entity;
 
 import lombok.Data;
-import site.dunhanson.tablestore.spring.boot.annotation.PrimaryKey;
-import site.dunhanson.tablestore.spring.boot.annotation.Table;
+import site.dunhanson.tablestore.spring.boot.starter.annotation.PrimaryKey;
+import site.dunhanson.tablestore.spring.boot.starter.annotation.Table;
 
 /**
  * 档案

@@ -1,26 +1,19 @@
-package site.dunhanson.tablestore.spring.boot.util;
+package site.dunhanson.tablestore.spring.boot.starter.util;
 
-import cn.hutool.core.bean.BeanUtil;
-import com.alicloud.openservices.tablestore.model.ColumnValue;
-import com.alicloud.openservices.tablestore.model.PrimaryKeyBuilder;
-import com.alicloud.openservices.tablestore.model.PrimaryKeyValue;
-import com.alicloud.openservices.tablestore.model.RowPutChange;
-import com.alicloud.openservices.tablestore.model.search.query.RangeQuery;
 import com.google.common.base.CaseFormat;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
-import site.dunhanson.tablestore.spring.boot.annotation.PrimaryKey;
+import site.dunhanson.tablestore.spring.boot.starter.annotation.PrimaryKey;
+
 import java.lang.reflect.Field;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Tablestore工具类
  * @author dunhanson
- * @since 2021-12-07
+ * @version  0.0.1
+ * @since 0.0.1
  */
 @Slf4j
 public class TablestoreUtils {

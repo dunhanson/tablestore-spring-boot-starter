@@ -1,4 +1,4 @@
-package site.dunhanson.tablestore.spring.boot.config.properties;
+package site.dunhanson.tablestore.spring.boot.starter.config.properties;
 
 import com.alicloud.openservices.tablestore.model.RetryStrategy;
 import lombok.Data;
@@ -7,7 +7,8 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 /**
  * tablestore的相关配置
  * @author dunhanson
- * @since 2021-12-07
+ * @version  0.0.1
+ * @since 0.0.1
  */
 @Data
 @ConfigurationProperties(prefix = "tablestore.client-configuration")

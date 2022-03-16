@@ -1,13 +1,14 @@
-package site.dunhanson.tablestore.spring.boot.entity;
+package site.dunhanson.tablestore.spring.boot.starter.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import site.dunhanson.tablestore.spring.boot.constant.TablestoreConstant;
+import site.dunhanson.tablestore.spring.boot.starter.constant.TablestoreConstant;
 
 /**
  * 分页对象
  * @author dunhanson
- * @since 2021-12-03
+ * @version  0.0.1
+ * @since 0.0.1
  */
 @Data
 @AllArgsConstructor

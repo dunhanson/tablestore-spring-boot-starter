@@ -1,11 +1,12 @@
-package site.dunhanson.tablestore.spring.boot.util;
+package site.dunhanson.tablestore.spring.boot.starter.util;
 
 import com.google.common.base.CaseFormat;
 
 /**
  * 格式化工具类
  * @author dunhanson
- * @since 2021-12-07
+ * @version  0.0.1
+ * @since 0.0.1
  */
 public class BasicUtils {
     /**

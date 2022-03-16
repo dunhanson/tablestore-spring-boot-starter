@@ -1,8 +1,7 @@
-package site.dunhanson.tablestore.spring.boot.core;
+package site.dunhanson.tablestore.spring.boot.starter.core;
 
 import cn.hutool.core.util.ClassUtil;
 import cn.hutool.core.util.PageUtil;
-import cn.hutool.json.JSONUtil;
 import com.alicloud.openservices.tablestore.SyncClient;
 import com.alicloud.openservices.tablestore.model.*;
 import com.alicloud.openservices.tablestore.model.search.SearchQuery;
@@ -17,12 +16,12 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import site.dunhanson.tablestore.spring.boot.annotation.Table;
-import site.dunhanson.tablestore.spring.boot.constant.TablestoreConstant;
-import site.dunhanson.tablestore.spring.boot.entity.Condition;
-import site.dunhanson.tablestore.spring.boot.entity.Page;
-import site.dunhanson.tablestore.spring.boot.entity.PageInfo;
-import site.dunhanson.tablestore.spring.boot.util.TablestoreUtils;
+import site.dunhanson.tablestore.spring.boot.starter.annotation.Table;
+import site.dunhanson.tablestore.spring.boot.starter.constant.TablestoreConstant;
+import site.dunhanson.tablestore.spring.boot.starter.entity.Condition;
+import site.dunhanson.tablestore.spring.boot.starter.entity.Page;
+import site.dunhanson.tablestore.spring.boot.starter.entity.PageInfo;
+import site.dunhanson.tablestore.spring.boot.starter.util.TablestoreUtils;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -30,12 +29,22 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
-import static site.dunhanson.tablestore.spring.boot.util.TablestoreUtils.toLowerUnderscore;
 
 /**
- * TablestoreTemplate
+ * 执行Tablestore表格存储模板操作.
+ * <p>{@code
+ *   TermQuery query = new TermQuery();
+ *   query.setFieldName("tenderee");
+ *   query.setTerm(ColumnValue.fromString("邯郸钢铁集团有限责任公司"));
+ *   PageInfo<Document> pageInfo = tablestoreTemplate.search(Document.class, new Page(1, 5), query);
+ *   System.out.println(pageInfo.getCurrent(0));
+ *   System.out.println(pageInfo.getSize());
+ *   System.out.println(pageInfo.getTotal());
+ *   System.out.println(pageInfo.getPages());
+ * }</pre>
  * @author dunhanson
- * @since 2021-12-07
+ * @version  0.0.1
+ * @since 0.0.1
  */
 @AllArgsConstructor
 @Slf4j
@@ -180,7 +189,7 @@ public class TablestoreTemplate {
      * @param <T> 实体对象
      * @return PageInfo
      */
-    public <T> PageInfo<T> page(Class<T> clazz, Page page, Query query, List<Sort.Sorter> sorts, List<String> returnColumns) {
+    private <T> PageInfo<T> page(Class<T> clazz, Page page, Query query, List<Sort.Sorter> sorts, List<String> returnColumns) {
         LocalDateTime start = LocalDateTime.now();
         // 需要获取的记录大小
         int needToGetNum = page.getPageSize();
@@ -246,7 +255,7 @@ public class TablestoreTemplate {
      * @param query Query
      * @param <T> 泛型
      */
-    public <T> void setNextPageQuery(T entity, int pageNo, Query query) {
+    private <T> void setNextPageQuery(T entity, int pageNo, Query query) {
         // 获取主键名称
         String primaryKey = Objects.requireNonNull(TablestoreUtils.getPrimaryKey(entity.getClass())).value();
         Long primaryKeyValue = TablestoreUtils.getPrimaryKeyValue(entity);
@@ -308,7 +317,7 @@ public class TablestoreTemplate {
         for(Field field : ClassUtil.getDeclaredFields(clazz)) {
             field.setAccessible(true);
             // Column名称
-            String columnName = toLowerUnderscore(field.getName());
+            String columnName = TablestoreUtils.toLowerUnderscore(field.getName());
             // 主键
             PrimaryKeyColumn primaryKeyColumn = primaryKey.getPrimaryKeyColumn(columnName);
             if(primaryKeyColumn != null) {
@@ -355,7 +364,7 @@ public class TablestoreTemplate {
      * @param value 值
      * @param <T> 泛型
      */
-    public <T> void setValue(T t, Field field, Object value) {
+    private <T> void setValue(T t, Field field, Object value) {
         try {
             field.set(t, value);
         } catch (IllegalAccessException e) {

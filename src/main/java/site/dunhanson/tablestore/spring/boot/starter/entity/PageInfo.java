@@ -1,16 +1,16 @@
-package site.dunhanson.tablestore.spring.boot.entity;
+package site.dunhanson.tablestore.spring.boot.starter.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
 
 import java.util.List;
 
 /**
  * 分页对象
  * 2020-01-07
- * @author dunhanson
+ * @version  0.0.1
+ * @since 0.0.1
  */
 @Data
 @AllArgsConstructor

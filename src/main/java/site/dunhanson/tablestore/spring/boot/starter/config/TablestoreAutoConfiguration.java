@@ -1,4 +1,4 @@
-package site.dunhanson.tablestore.spring.boot.config;
+package site.dunhanson.tablestore.spring.boot.starter.config;
 
 import cn.hutool.core.bean.BeanUtil;
 import com.alicloud.openservices.tablestore.ClientConfiguration;
@@ -9,15 +9,16 @@ import com.google.gson.GsonBuilder;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import site.dunhanson.tablestore.spring.boot.config.properties.ClientConfigurationProperties;
-import site.dunhanson.tablestore.spring.boot.config.properties.TablestoreProperties;
-import site.dunhanson.tablestore.spring.boot.core.TablestoreTemplate;
+import site.dunhanson.tablestore.spring.boot.starter.config.properties.ClientConfigurationProperties;
+import site.dunhanson.tablestore.spring.boot.starter.config.properties.TablestoreProperties;
+import site.dunhanson.tablestore.spring.boot.starter.core.TablestoreTemplate;
 import javax.annotation.Resource;
 
 /**
  * tablestore的初始化配置
  * @author dunhanson
- * @since 2021-12-07
+ * @version  0.0.1
+ * @since 0.0.1
  */
 @Configuration
 @EnableConfigurationProperties(value = {TablestoreProperties.class, ClientConfigurationProperties.class})
