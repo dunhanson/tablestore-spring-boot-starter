@@ -28,18 +28,18 @@ public class StartTest {
     private TablestoreTemplate tablestoreTemplate;
 
     @Test
-    public void start() {
+    public void startQuery() {
         // query
         TermQuery query = new TermQuery();
         query.setFieldName("id");
-        query.setTerm(ColumnValue.fromString("1000"));
+        query.setTerm(ColumnValue.fromLong(1000L));
         // search
         PageInfo<Archives> pageInfo = tablestoreTemplate.search(Archives.class, query);
         pageInfo.getRecords().forEach(System.out::println);
     }
 
     @Test
-    public void test() {
+    public void testCondition() {
         // query
         TermQuery query = new TermQuery();
         query.setFieldName("id");

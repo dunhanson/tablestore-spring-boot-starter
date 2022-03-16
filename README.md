@@ -8,19 +8,18 @@
 <dependency>
     <groupId>site.dunhanson</groupId>
     <artifactId>tablestore-spring-boot-starter</artifactId>
-    <version>0.0.1</version>
+    <version>0.0.3</version>
 </dependency>
 ```
 
 **application.yml**
 
 ```yml
-aliyun:
-  tablestore:
-    end-point: 'XXXXXX'
-    access-key-id: 'XXXXXX'
-    access-key-secret: 'XXXXXX'
-    instance-name: 'XXXXXX'
+tablestore:
+  end-point: 'XXXXXX'
+  access-key-id: 'XXXXXX'
+  access-key-secret: 'XXXXXX'
+  instance-name: 'XXXXXX'
 ```
 
 **java**
@@ -31,6 +30,7 @@ aliyun:
 @Data
 @Table(tableName = "archives", indexName = "archives_index")
 public class Archives {
+    @PrimaryKey("id")
     private String id;
     private String title;
     private String content;
@@ -49,13 +49,30 @@ public class StartTest {
     private TablestoreTemplate tablestoreTemplate;
 
     @Test
-    public void start() {
+    public void startQuery() {
         // query
         TermQuery query = new TermQuery();
         query.setFieldName("id");
-        query.setTerm(ColumnValue.fromString("d201c4b1-6db6-4e06-b5db-cbb796b2e56b"));
+        query.setTerm(ColumnValue.fromLong(1000L));
         // search
         PageInfo<Archives> pageInfo = tablestoreTemplate.search(Archives.class, query);
+        pageInfo.getRecords().forEach(System.out::println);
+    }
+
+    @Test
+    public void testCondition() {
+        // query
+        TermQuery query = new TermQuery();
+        query.setFieldName("id");
+        query.setTerm(ColumnValue.fromString("1000"));
+        // condition
+        Condition condition = new Condition();
+        condition.setPage(new Page(1, 30));
+        condition.setQuery(query);
+        condition.setReturnColumns(Collections.singletonList("id"));
+        condition.setSorts(Collections.singletonList(new FieldSort("id", SortOrder.DESC)));
+        // search and return pageInfo
+        PageInfo<Archives> pageInfo = tablestoreTemplate.search(Archives.class, condition);
         pageInfo.getRecords().forEach(System.out::println);
     }
 }
